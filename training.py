@@ -1,6 +1,6 @@
 from gym_torcs_pp import PPEnv
-from ddpg import *
-from sample_agent import Agent
+from scripts.ddpg import *
+from scripts.sample_agent import Agent
 from pure_pursuit import PurePursuitModel
 import sys
 import numpy as np

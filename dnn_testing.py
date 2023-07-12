@@ -1,6 +1,5 @@
 from gym_torcs_sl import SLEnv
-from gym_torcs_pp import PPEnv
-from logger import Logger
+from utils.logger import Logger
 from sl_agent import DNNAgent
 import sys
 import numpy as np
@@ -25,7 +24,7 @@ def torqs_test():
     env = SLEnv(vision=vision, render=True, race_config_path=race_config_path, brake_change=True, throttle=True, clutch_change=True, gear_change=False)
 
     sl_agent = DNNAgent("/home/cognitia/Desktop/phd/torcs/torcs_SL/DNN_model")
-    logger = Logger("DNN/g-track-2")
+    logger = Logger("Experiments/DNN/g-track-2")
 
     print("TORCS Experiment Start.")
     for i in range(episode_count):

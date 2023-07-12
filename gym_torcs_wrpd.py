@@ -1,16 +1,13 @@
 import gym
 from gym import spaces
-import numpy as np
 # from os import path
-import snakeoil3_gym_raceconfig as snakeoil3
+from scripts import snakeoil3_gym_raceconfig as snakeoil3
 import numpy as np
 import copy
 import collections as col
 ### TODO: Get out of the way: os
-import os
 import subprocess
 import psutil
-import time
 
 DEF_BOX_DTYPE = np.float32
 
@@ -57,6 +54,7 @@ class TorcsEnv( gym.Env):
         #Workaround: Sometimes the process has to be killed in them
         #SnakeOil3 file so we use the process_pid instead of the process object
         #my apologies
+        print(args)
         self.torcs_process_id = subprocess.Popen( args, shell=False).pid
 
         """

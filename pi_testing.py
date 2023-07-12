@@ -1,41 +1,37 @@
-from gym_torcs_sl import SLEnv
-from gym_torcs_pp import PPEnv
+from gym_torcs_pi import PIEnv
 from sl_agent import PIAgent, DNNAgent
-from logger import Logger
+from utils.logger import Logger
 from pure_pursuit import PurePursuitModel
-import sys
 import numpy as np
 
-#Torcs Env Tests
-def torqs_test():
+
+MODEL_TYPE = 'pi'
+
+
+def run(model_type, race_config_path="/scratch/msz6/Gym-Torcs/raceconfig/agent_practice.xml"):
     #Torcs multiple instance test
+
+    assert model_type in ['pi', 'dnn', 'pp'], " Model type should be one of ['pi', 'dnn', 'pp']"
+
     vision = False
     episode_count = 2
-    max_steps = 300
-    reward = 0
-    done = False
+    max_steps = 1500
     step = 0
 
-    # Generate a Torcs environment
-    # Race config expected as first argument
-    if len( sys.argv) > 1:
-        race_config_path = sys.argv[1]
-    else:
-        race_config_path = "/home/cognitia/Desktop/phd/torcs/GymTorcs/gym_torqs/raceconfig/agent_practice.xml"
+    kwargs = {'throttle': False, 'brake_change': False, 'gear_change': False}
 
-    # env = SLEnv(vision=vision, render=True, race_config_path=race_config_path, brake_change=True, throttle=True, clutch_change=True, gear_change=False)
-    env = PPEnv(vision=vision, race_config_path=race_config_path, render=True)
+    env = PIEnv(vision=vision, race_config_path=race_config_path, render=True, **kwargs)
 
-    sl_agent = PIAgent("/home/cognitia/Desktop/phd/torcs/torcs_SL/PI_model")
+    sl_agent = PIAgent("./training_sl/PI_model") if model_type == "pi" else DNNAgent("./training_sl/PI_model")
 
     physics_model = PurePursuitModel()
 
-    logger = Logger("PI/aalborg")
+    logger = Logger(f"Experiments/{model_type}/aalborg")
 
     print("TORCS Experiment Start.")
+
     for i in range(episode_count):
         print("Episode : " + str(i))
-
 
         if np.mod(i, 3) == 0:
             # Sometimes you need to relaunch TORCS because of the memory leak error
@@ -43,16 +39,27 @@ def torqs_test():
         else:
             ob, ob_vect = env.reset(normalize=False)
 
-        total_reward = 0.
         for j in range(max_steps):
-            steer, lookahead = sl_agent.get_actions(ob)
-            print(lookahead)
-            action, lookahead = physics_model.action(ob, lookahead)
+
+            lookahead = None
             # [steer, accelerate, brake, gear]
-            print(steer, action[0])
-            # ob, done = env.step(action, continuous=True, normalize=False)
-            ob, ob_vect, reward, done, _ = env.step(action, continuous=True, normalize=False)
-            logger.store_record(ob, {"steer": action[0], "accel": action[1]}, lookahead)
+            action = {}
+
+            if model_type == 'pp':
+                action, lookahead = physics_model.get_actions(ob)
+
+            elif model_type == 'dnn':
+                action = sl_agent.get_actions(ob)
+
+            elif model_type == 'pi':
+                action = sl_agent.get_actions(ob)
+                lookahead = action['lookahead']
+                action = physics_model.get_actions(ob, lookahead)
+
+            ob, pre_ob, done = env.step(action, normalize=False)
+            print(action)
+
+            logger.store_record(ob, action, lookahead)
 
             step += 1
             if done:
@@ -65,4 +72,5 @@ def torqs_test():
 
 
 if __name__ == "__main__":
-    torqs_test()
+
+    run(MODEL_TYPE)

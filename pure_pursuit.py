@@ -2,6 +2,8 @@ import math
 import numpy as np
 from simple_pid import PID
 
+from agent import Agent
+
 PI_HALF = math.pi / 2.0 # 90 deg
 PI_FOURTHS = math.pi / 4.0 # 45 deg
 RAD_PER_DEG = math.pi / 180.0
@@ -47,10 +49,10 @@ controller_options = {"kp": 0.2, "ki": 0, "kd": 0}
 steering_values = []
 
 
-
-class PurePursuitModel:
+class PurePursuitModel(Agent):
 
     def __init__(self):
+        super().__init__('pp')
         self.speed_controller = PID(Kp=controller_options['kp'], Ki=controller_options['ki'], Kd=controller_options['kd'],
                                     setpoint=100)
         self.cur_accel = 0.
@@ -67,26 +69,22 @@ class PurePursuitModel:
     def is_off_track(ob):
         return np.abs(ob['trackPos']) > 1.0 and np.abs(ob['angle']) > PI_HALF
 
-    def action(self, ob, lookahead=None):
-        speed = math.sqrt(ob['speedX'] ** 2 + ob['speedY'] ** 2)
+    def get_actions(self, ob, lookahead=None):
 
         if lookahead:
             # print(lookahead)
             divider = lookahead
         else:
+            speed = math.sqrt(ob['speedX'] ** 2 + ob['speedY'] ** 2)
             divider = 20 if speed < 90 else (PURE_PURSUIT_K * speed)
 
-        steer =  self.compute_steering(ob, divider)
-        # steer = 0
-        # print(ob['trackPos'])
-        # if ob['trackPos'] < 0:
-        #     steer = 0.5
-        # if ob['trackPos'] > 0:
-        #     steer = -0.5
+        steer = self.compute_steering(ob, divider)
 
         accelerate, brake, gear = self.compute_speed(ob)
 
-        return [steer, accelerate, brake, gear], divider
+        actions = {'accel': accelerate, 'brake': brake, 'gear': gear, 'steer': steer, 'lookahead': divider}
+
+        return actions
 
     def compute_steering(self, ob, lookahead):
         global steering_values

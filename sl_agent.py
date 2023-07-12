@@ -1,12 +1,15 @@
 import numpy as np
 import tensorflow as tf
 from pathlib import Path
+
+from agent import Agent
 from pure_pursuit import PURE_PURSUIT_2L, RAD_PER_DEG, DEG_PER_RAD, MAX_STEERING_ANGLE_DEG
 from tensorflow.keras.models import load_model
 
 
-class DNNAgent:
+class DNNAgent(Agent):
     def __init__(self, model_path: str):
+        super().__init__('dnn')
         self.model_path = Path(model_path)
         print(self.model_path.joinpath("model.h5").as_posix())
         self._mean = np.load(self.model_path.joinpath("means.npy").as_posix())
@@ -41,12 +44,20 @@ class DNNAgent:
         'Acceleration', 'Braking', 'Clutch', 'Steering'
         """
         output = self.model.predict(norm_state.reshape(1, -1), batch_size=1).flatten()
-        return output
+        # Formatting output to follow [steer, accelerate, brake, gear]
+        actions = {'accel': output[0], 'brake': output[1], 'clutch': output[2], 'steer': output[3]}
+
+        return actions
 
 
-class PIAgent(DNNAgent):
+class PIAgent(Agent):
     def __init__(self, model_path: str):
-        super().__init__(model_path)
+        super().__init__('pi')
+        self.model_path = Path(model_path)
+        print(self.model_path.joinpath("model.h5").as_posix())
+        self._mean = np.load(self.model_path.joinpath("means.npy").as_posix())
+        self._std = np.load(self.model_path.joinpath("stds.npy").as_posix())
+        self.model = self.load_model()
 
     def load_model(self):
         return load_model(self.model_path.joinpath("model.h5").as_posix(), custom_objects={'compute_steering': self.compute_steering,
@@ -77,7 +88,9 @@ class PIAgent(DNNAgent):
 
         # lookahead = np.clip(lookahead, 0, 200)
 
-        return steer.flatten()[0], lookahead.flatten()[0]
+        actions = {'steer': steer.flatten()[0], 'lookahead': lookahead.flatten()[0]}
+
+        return actions
 
     @tf.function
     def get_max_dist(self, track_dists):

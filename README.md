@@ -47,7 +47,7 @@ After the selection of the driving-window mode, you need to set the appropriate 
 # Simple How-To
 
 ```python
-from gym_torcs import TorcsEnv
+from scripts.gym_torcs import TorcsEnv
 
 #### Generate a Torcs environment
 # enable vision input, the action is steering only (1 dim continuous action)
@@ -60,7 +60,8 @@ ob = env.reset(relaunch=True)  # with torcs relaunch (avoid memory leak bug in t
 # ob = env.reset()  # without torcs relaunch
 
 # Generate an agent
-from sample_agent import Agent
+from scripts.sample_agent import Agent
+
 agent = Agent(1)  # steering only
 action = agent.act(ob, reward, done, vision=True)
 

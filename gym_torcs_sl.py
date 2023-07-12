@@ -1,8 +1,8 @@
 import numpy as np
 import copy
 from gym_torcs_wrpd import TorcsEnv
-from rewarder import Rewarder
-import snakeoil3_gym_raceconfig as snakeoil3
+from scripts import snakeoil3_gym_raceconfig as snakeoil3
+
 
 class SLEnv(TorcsEnv):
     def __init__(self, vision=False, throttle=True, gear_change=True, brake_change=True, race_config_path=None, render=False, clutch_change=True):

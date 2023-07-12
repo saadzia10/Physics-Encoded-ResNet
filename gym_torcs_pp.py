@@ -1,8 +1,9 @@
 import numpy as np
 import copy
 from gym_torcs_wrpd import TorcsEnv
-from rewarder import Rewarder
-import snakeoil3_gym_raceconfig as snakeoil3
+from utils.rewarder import Rewarder
+from scripts import snakeoil3_gym_raceconfig as snakeoil3
+
 
 class PPEnv(TorcsEnv):
     def __init__(self, vision=False, throttle=True, gear_change=False, brake_change=True, race_config_path=None, render=False):
@@ -134,13 +135,10 @@ class PPEnv(TorcsEnv):
             self.client.R.d['meta'] = True
             self.client.respond_to_server()
 
-            ## TENTATIVE. Restarting TORCS every episode suffers the memory leak bug!
             if relaunch is True:
                 self.reset_torcs()
                 print("### TORCS is RELAUNCHED ###")
 
-        # Modify here if you use multiple tracks in the environment
-        ### dosssman: Pass existing process id and race config path
         self.client = snakeoil3.Client(p=3101, vision=self.vision,
             process_id=self.torcs_process_id,
             race_config_path=self.race_config_path)  #Open new UDP in vtorcs
