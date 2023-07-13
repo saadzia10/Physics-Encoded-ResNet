@@ -24,7 +24,7 @@ def torqs_test():
     env = SLEnv(vision=vision, render=True, race_config_path=race_config_path, brake_change=True, throttle=True, clutch_change=True, gear_change=False)
 
     sl_agent = DNNAgent("/home/cognitia/Desktop/phd/torcs/torcs_SL/DNN_model")
-    logger = Logger("Experiments/DNN/g-track-2")
+    logger = Logger("../Experiments/DNN/g-track-2")
 
     print("TORCS Experiment Start.")
     for i in range(episode_count):
