@@ -1,4 +1,4 @@
-from gym_torcs_sl import SLEnv
+from scripts.gym_torcs_sl import SLEnv
 from utils.logger import Logger
 from sl_agent import DNNAgent
 import sys

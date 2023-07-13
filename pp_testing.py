@@ -1,4 +1,4 @@
-from gym_torcs_pp import PPEnv
+from scripts.gym_torcs_pp import PPEnv
 from utils.logger import Logger
 from scripts.sample_agent import Agent
 from pure_pursuit import PurePursuitModel

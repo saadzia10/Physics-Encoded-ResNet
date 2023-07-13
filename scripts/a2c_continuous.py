@@ -2,18 +2,12 @@ import tensorflow as tf
 from tensorflow import layers
 from tensorflow.contrib.layers import xavier_initializer
 
-import gym
 import numpy as np
 
-from collections import deque
-from collections import namedtuple
-
-import sys, os
-import random
 from time import time
 from datetime import datetime
 
-from gym_torcs_wrpd_cont import TorcsEnv
+from scripts.gym_torcs_wrpd_cont import TorcsEnv
 
 ###### Torqs Env parameters
 vision, throttle, gear_change = False, True, False
