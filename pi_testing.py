@@ -3,13 +3,16 @@ from sl_agent import PIAgent, DNNAgent
 from utils.logger import Logger
 from pure_pursuit import PurePursuitModel
 import numpy as np
+from pathlib import Path
 
 
 MODEL_TYPE = 'pi'
 
 
-def run(model_type, race_config_path="/scratch/msz6/Gym-Torcs/raceconfig/agent_practice.xml"):
+def run(model_type, race_config_path="raceconfig/agent_practice.xml"):
     #Torcs multiple instance test
+    assert Path(race_config_path).exists(), f"Path to race_config {race_config_path} does not exist "
+    race_config_path = Path(race_config_path).absolute().as_posix()
 
     assert model_type in ['pi', 'dnn', 'pp'], " Model type should be one of ['pi', 'dnn', 'pp']"
 
