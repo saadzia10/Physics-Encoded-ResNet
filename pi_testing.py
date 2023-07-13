@@ -6,11 +6,11 @@ import numpy as np
 from pathlib import Path
 
 
-MODEL_TYPE = 'pi'
+MODEL_TYPE = 'pp'
 
 
 def run(model_type, race_config_path="raceconfig/agent_practice.xml"):
-    #Torcs multiple instance test
+
     assert Path(race_config_path).exists(), f"Path to race_config {race_config_path} does not exist "
     race_config_path = Path(race_config_path).absolute().as_posix()
 
@@ -21,11 +21,11 @@ def run(model_type, race_config_path="raceconfig/agent_practice.xml"):
     max_steps = 1500
     step = 0
 
-    kwargs = {'throttle': False, 'brake_change': False, 'gear_change': False}
+    kwargs = {'throttle': True, 'brake_change': True, 'gear_change': False}
 
     env = PIEnv(vision=vision, race_config_path=race_config_path, render=True, **kwargs)
 
-    sl_agent = PIAgent("./training_sl/PI_model") if model_type == "pi" else DNNAgent("./training_sl/PI_model")
+    sl_agent = PIAgent("./training_sl/PI_model") if model_type == "pi" else DNNAgent("./training_sl/DNN_model")
 
     physics_model = PurePursuitModel()
 
@@ -49,10 +49,14 @@ def run(model_type, race_config_path="raceconfig/agent_practice.xml"):
             action = {}
 
             if model_type == 'pp':
-                action, lookahead = physics_model.get_actions(ob)
+                action = physics_model.get_actions(ob)
+                lookahead = action['lookahead']
 
             elif model_type == 'dnn':
                 action = sl_agent.get_actions(ob)
+                # p_action = physics_model.get_actions(ob)
+                # p_action['steer'] = action['steer']
+                # action = p_action
 
             elif model_type == 'pi':
                 action = sl_agent.get_actions(ob)

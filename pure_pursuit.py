@@ -22,7 +22,7 @@ BRAKING_DELTA = 0.05 # dampen braking to avoid lockup, max rate of chage in brak
 WHEELSPIN_ACCEL_DELTA = 0.025
 WHEELSPIN_MAX = 5.0 # greater than this value --> loss of control
 
-PURE_PURSUIT_K = 0.35 # bias - increase to reduces steering sensitivity
+PURE_PURSUIT_K = 0.5 # bias - increase to reduces steering sensitivity
 PURE_PURSUIT_L = 2.4  # approx vehicle wheelbase
 PURE_PURSUIT_2L = 2 * PURE_PURSUIT_L;
 MAX_STEERING_ANGLE_DEG = 21 # steering lock
@@ -76,7 +76,7 @@ class PurePursuitModel(Agent):
             divider = lookahead
         else:
             speed = math.sqrt(ob['speedX'] ** 2 + ob['speedY'] ** 2)
-            divider = 20 if speed < 90 else (PURE_PURSUIT_K * speed)
+            divider = PURE_PURSUIT_K * speed
 
         steer = self.compute_steering(ob, divider)
 
