@@ -76,9 +76,9 @@ class PurePursuitModel(Agent):
             divider = lookahead
         else:
             speed = math.sqrt(ob['speedX'] ** 2 + ob['speedY'] ** 2)
-            divider = PURE_PURSUIT_K * speed
+            divider = np.min([ob['track'][8], ob['track'][9], ob['track'][10]]) if speed > 10 else PURE_PURSUIT_K * speed
 
-        steer = self.compute_steering(ob, divider)
+        steer = self.compute_steering(ob, divider) if lookahead else None
 
         accelerate, brake, gear = self.compute_speed(ob)
 
@@ -99,7 +99,7 @@ class PurePursuitModel(Agent):
         # raw_steering_angle_rad = -math.atan(
         #     PURE_PURSUIT_2L * math.sin(target_angle) / (PURE_PURSUIT_K * speed))
         raw_steering_angle_rad = -math.atan(
-            PURE_PURSUIT_2L * math.sin(target_angle) / lookahead)
+            (PURE_PURSUIT_2L * math.sin(target_angle)) / lookahead)
 
         raw_steering_angle_deg = raw_steering_angle_rad * DEG_PER_RAD
 
@@ -141,7 +141,7 @@ class PurePursuitModel(Agent):
     def compute_speed(self, ob):
         accel = 0
         gear = ob['gear']
-        braking_zone = ob['track'][9] < ob['speedX'] / 1.5# self.get_max_dist(ob) < ob['speedX'] * 3
+        braking_zone = ob['track'][9] < ob['speedX']   # self.get_max_dist(ob) < ob['speedX'] * 3
         target_speed = 0
         has_wheel_spin = False
         speed = math.sqrt(ob['speedX'] ** 2 + ob['speedY'] ** 2)

@@ -104,7 +104,7 @@ class PIEnv(TorcsEnv):
         progress = sp * np.cos(obs['angle'])
 
         # Termination judgement #
-        if track.min() < 0:  # Episode is terminated if the car is out of track
+        if track.min() < -1:  # Episode is terminated if the car is out of track
             client.R.d['meta'] = True
 
         if self.terminal_judge_start < self.time_step: # Episode terminates if the progress of agent is small
