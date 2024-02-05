@@ -11,7 +11,7 @@ class Logger:
 
         self.buffer = []
 
-    def store_record(self, ob, actions, lookahead=None):
+    def store_record(self, ob, actions, lookahead=None, target_angle=None):
         to_store = {}
 
         to_store["angle"] = ob["angle"]
@@ -24,7 +24,11 @@ class Logger:
         to_store["steer"] = actions['steer']
         to_store["accel"] = actions['accel']
         to_store["lookahead"] = lookahead
+        to_store["target_angle"] = target_angle
         to_store["dist_ahead"] = ob['track'][9]
+
+        to_store["track"] = ob["track"]
+
 
         self.buffer.append(to_store)
 

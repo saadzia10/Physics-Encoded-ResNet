@@ -7,9 +7,9 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 RENDER = True
-MODEL_TYPE = 'dnn'
+MODEL_TYPE = 'pi'
 
-test_tracks = [('dirt', 'dirt-1'), ('dirt', 'dirt-2'),  ('road', 'e-track-2'), ('road', 'spring'), ('road', 'ruudskogen'), ('dirt', 'dirt-3')]
+test_tracks = [('dirt', 'dirt-1')]# [('dirt', 'dirt-1'), ('dirt', 'dirt-2'),  ('road', 'e-track-2'), ('road', 'spring'), ('road', 'ruudskogen'), ('dirt', 'dirt-3')]
 
 
 def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml", render=False):
@@ -27,7 +27,7 @@ def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml"
 
     tree.write(race_config_path)
 
-    logger = Logger(f"Experiments_New/{model_type}_b/{map_name}")
+    logger = Logger(f"Experiments_Disc/{model_type}/{map_name}")
 
     assert model_type in ['pi', 'dnn', 'pp'], " Model type should be one of ['pi', 'dnn', 'pp']"
 
@@ -61,6 +61,7 @@ def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml"
             #     continue
 
             lookahead = None
+            target_angle = None
             # [steer, accelerate, brake, gear]
             action = {}
 
@@ -78,6 +79,7 @@ def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml"
             elif model_type == 'pi':
                 action = sl_agent.get_actions(ob)
                 lookahead = action['lookahead']
+                target_angle = action['target_angle']
                 # action = physics_model.get_actions(ob, lookahead)
                 p_action = physics_model.get_actions(ob)
                 p_action['steer'] = action['steer']
@@ -87,7 +89,7 @@ def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml"
             ob, pre_ob, done = env.step(action, normalize=False)
             # print(action)
 
-            logger.store_record(ob, action, lookahead) if i > 0 else None
+            logger.store_record(ob, action, lookahead, target_angle) if i > 0 else None
 
             step += 1
 

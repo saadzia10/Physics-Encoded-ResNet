@@ -1,1 +1,0 @@
-/home/cognitia/Desktop/phd/torcs/GymTorcs/gym_torqs/vtorcs-RL-color/src/libs/math/straight2_t.h

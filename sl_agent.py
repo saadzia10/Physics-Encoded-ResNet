@@ -134,7 +134,7 @@ class PIAgent(Agent):
 
         # lookahead = np.clip(lookahead, 0, 200)
 
-        actions = {'steer': steer.flatten()[0], 'lookahead': lookahead.flatten()[1]}
+        actions = {'steer': steer.flatten()[0], 'lookahead': lookahead.flatten()[1], 'target_angle': lookahead.flatten()[0]}
 
         return actions
 
