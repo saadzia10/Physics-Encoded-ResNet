@@ -1,15 +1,15 @@
 from gym_torcs_pi import PIEnv
-from sl_agent import PIAgent, DNNAgent
+from sl_agent import PIAgent, DNNAgent, PINNAgent
 from utils.logger import Logger
 from pure_pursuit import PurePursuitModel
 import numpy as np
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-RENDER = True
-MODEL_TYPE = 'pi'
+RENDER = False
+MODEL_TYPE = 'PENN'
 
-test_tracks = [('dirt', 'dirt-1')]# [('dirt', 'dirt-1'), ('dirt', 'dirt-2'),  ('road', 'e-track-2'), ('road', 'spring'), ('road', 'ruudskogen'), ('dirt', 'dirt-3')]
+test_tracks = [('dirt', 'dirt-1'), ('dirt', 'dirt-2'), ('road', 'alpine-2'), ('road', 'wheel-2'), ('road', 'ruudskogen'), ('dirt', 'dirt-3'), ('dirt', 'dirt-4'), ('dirt', 'dirt-5')]
 
 
 def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml", render=False):
@@ -27,9 +27,9 @@ def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml"
 
     tree.write(race_config_path)
 
-    logger = Logger(f"Experiments_Disc/{model_type}/{map_name}")
+    logger = Logger(f"Experiments_Revision/{model_type}/{map_name}")
 
-    assert model_type in ['pi', 'dnn', 'pp'], " Model type should be one of ['pi', 'dnn', 'pp']"
+    # assert model_type in ['pi', 'dnn', 'pp', 'PENN', 'PERNN', 'PINN', 'FCNN_l', 'FCNN_m', 'FCNN_s'], " Model type should be one of ['pi', 'dnn', 'pp']"
 
     vision = False
     episode_count = 3
@@ -40,7 +40,12 @@ def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml"
 
     env = PIEnv(vision=vision, race_config_path=race_config_path, render=render, **kwargs)
 
-    sl_agent = PIAgent("training_sl/PI_model_new_3") if model_type == "pi" else DNNAgent("training_sl/DNN_model_BIG")
+    if model_type in ["pi", "PENN", "PERNN"]:
+        sl_agent = PIAgent("training_sl/Experiments/PENN")
+    elif model_type in ['FCNN_l', 'FCNN_m', 'FCNN_s', 'PINN_s', 'PINN_m', 'PINN_l']:
+        sl_agent = PINNAgent("training_sl/Experiments/PINN_s")
+    else:
+        sl_agent = DNNAgent("training_sl/DNN_model_BIG")
 
     physics_model = PurePursuitModel()
 
@@ -76,7 +81,7 @@ def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml"
                 # p_action = action
                 action = p_action
 
-            elif model_type == 'pi':
+            elif model_type in ['pi', 'PERNN', 'PENN']:
                 action = sl_agent.get_actions(ob)
                 lookahead = action['lookahead']
                 target_angle = action['target_angle']
@@ -84,6 +89,13 @@ def run(model_type, track=None, race_config_path="raceconfig/agent_practice.xml"
                 p_action = physics_model.get_actions(ob)
                 p_action['steer'] = action['steer']
 
+                action = p_action
+
+            elif model_type in ['FCNN_l', 'FCNN_m', 'FCNN_s', 'PINN_s', 'PINN_m', 'PINN_l']:
+                action = sl_agent.get_actions(ob)
+                p_action = physics_model.get_actions(ob)
+                p_action['steer'] = action['steer']
+                # p_action = action
                 action = p_action
 
             ob, pre_ob, done = env.step(action, normalize=False)

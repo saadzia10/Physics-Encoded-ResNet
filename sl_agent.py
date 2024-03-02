@@ -87,6 +87,55 @@ class DNNAgent(Agent):
         return actions
 
 
+class PINNAgent(Agent):
+    def __init__(self, model_path: str):
+        super().__init__('PINN')
+        self.model_path = Path(model_path)
+        print(self.model_path.joinpath("model.h5").as_posix())
+        self._mean = np.load(self.model_path.joinpath("means.npy").as_posix())
+        self._std = np.load(self.model_path.joinpath("stds.npy").as_posix())
+        self.model = self.load_model()
+
+    def load_model(self):
+        return load_model(self.model_path.joinpath("model.h5").as_posix(), custom_objects={'pinn_loss': self.pinn_loss})
+
+    @staticmethod
+    def make_observation(raw_obs):
+
+        return np.concatenate([
+            np.array(raw_obs['opponents'], dtype=np.float32),
+            np.array(raw_obs['track'], dtype=np.float32),
+            [np.array(raw_obs['trackPos'], dtype=np.float32)],
+            [np.array(raw_obs['angle'], dtype=np.float32)],
+            [np.array(raw_obs['rpm'], dtype=np.float32)],
+            [np.array(raw_obs['speedX'], dtype=np.float32)],
+            [np.array(raw_obs['speedY'], dtype=np.float32)],
+            [np.array(raw_obs['speedZ'], dtype=np.float32)],
+            np.array(raw_obs['wheelSpinVel'], dtype=np.float32)
+        ])
+
+    def get_actions(self, ob):
+
+        state = self.make_observation(ob)
+        norm_state = (state - self._mean) / self._std
+        # norm_state = np.concatenate((norm_state, [state[-1]]))
+        """
+        Output sequence:
+        'Acceleration', 'Braking', 'Clutch', 'Steering'
+        """
+        output = self.model.predict(norm_state.reshape(1, -1), batch_size=1).flatten()
+        actions = {'steer': output[0]}
+
+        return actions
+
+    @tf.function
+    def pinn_loss(self, y_true, y_pred):
+        y_data = y_true[:, 0]
+        y_phy = y_true[:, 1]
+
+        return tf.reduce_mean(tf.abs(y_data - y_pred)) + tf.reduce_mean(tf.abs(y_phy - y_pred))
+
+
 class PIAgent(Agent):
     def __init__(self, model_path: str):
         super().__init__('pi')
@@ -126,6 +175,7 @@ class PIAgent(Agent):
     def get_actions(self, ob):
         state = self.make_observation(ob)
         norm_state = (state - self._mean) / self._std
+
         """
         Output sequence:
         'Acceleration', 'Braking', 'Clutch', 'Steering'

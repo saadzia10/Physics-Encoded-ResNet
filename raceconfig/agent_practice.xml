@@ -10,7 +10,7 @@
   <section name="Tracks">
     <attnum name="maximum number" val="1" />
     <section name="1">
-      <attstr name="name" val="dirt-1" />
+      <attstr name="name" val="dirt-5" />
       <attstr name="category" val="dirt" />
     </section>
 
@@ -85,6 +85,18 @@
     <section name="1">
       <attstr name="module" val="championship2011server" />
       <attnum name="idx" val="0" />
+    </section>
+    <section name="2">
+      <attnum name="idx" val="1" />
+      <attstr name="module" val="bt" />
+    </section>
+    <section name="3">
+      <attnum name="idx" val="2" />
+      <attstr name="module" val="bt" />
+    </section>
+    <section name="4">
+      <attnum name="idx" val="3" />
+      <attstr name="module" val="bt" />
     </section>
 
   </section>
