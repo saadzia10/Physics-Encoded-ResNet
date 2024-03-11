@@ -1,2 +1,0 @@
-TORCS_BASE = /home/cognitia/Desktop/phd/torcs/GymTorcs/gym_torqs/vtorcs-RL-color
-MAKE_DEFAULT = /home/cognitia/Desktop/phd/torcs/GymTorcs/gym_torqs/vtorcs-RL-color/Make-default.mk
