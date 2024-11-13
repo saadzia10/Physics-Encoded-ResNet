@@ -30,7 +30,7 @@ def init_env(args):
     return seed, cuda_flag, render, load_model, save_model
 
 
-def load_dataset(n_characters=3, filename="data/character_data.pickle", test_label=("e", "q", "v")):
+def load_dataset(filename="data/character_data.pickle", test_label=("e", "q", "v")):
 
     with open(filename, 'rb') as f:
         data = pickle.load(f)
@@ -87,13 +87,13 @@ def load_dataset(n_characters=3, filename="data/character_data.pickle", test_lab
             train_p = np.vstack((train_p, data["p"][i]))
             train_pd = np.vstack((train_pd, data["pdot"][i]))
 
-    return (train_labels, train_qp, train_qv, train_qa, train_tau), \
-        (test_labels, test_qp, test_qv, test_qa, test_tau, test_m, test_c, test_g), \
-        divider
+    # return (train_labels, train_qp, train_qv, train_qa, train_tau), \
+    #     (test_labels, test_qp, test_qv, test_qa, test_tau, test_m, test_c, test_g), \
+    #     divider
 
-    # return (train_labels, train_qp, train_qv, train_qa, train_p, train_pd, train_tau), \
-    #        (test_labels, test_qp, test_qv, test_qa, test_p, test_pd, test_tau, test_m, test_c, test_g),\
-    #        divider, dt_mean
+    return (train_labels, train_qp, train_qv, train_qa, train_p, train_pd, train_tau), \
+           (test_labels, test_qp, test_qv, test_qa, test_p, test_pd, test_tau, test_m, test_c, test_g),\
+           divider, dt_mean
 
 
 def parition_params(module_name, name, value, key):

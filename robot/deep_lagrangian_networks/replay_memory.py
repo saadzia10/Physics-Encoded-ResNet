@@ -83,7 +83,7 @@ class ReplayMemory(object):
 
 
 class PyTorchReplayMemory(ReplayMemory):
-    def __init__(self, max_samples, minibatch_size, dim, cuda):
+    def __init__(self, max_samples, minibatch_size, dim, cuda, device):
         super(PyTorchReplayMemory, self).__init__(max_samples, minibatch_size, dim)
 
         self._cuda = cuda
@@ -91,7 +91,7 @@ class PyTorchReplayMemory(ReplayMemory):
             self._data[i] = torch.empty((self._max_samples,) + dim[i])
 
             if self._cuda:
-                self._data[i] = self._data[i].cuda()
+                self._data[i] = self._data[i].to(device)
 
     def add_samples(self, data):
 

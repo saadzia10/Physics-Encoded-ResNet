@@ -11,17 +11,12 @@ import matplotlib as mp
 import haiku as hk
 import dill as pickle
 
-try:
-    mp.use("Qt5Agg")
-    mp.rc('text', usetex=True)
-    mp.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
+mp.use("Qt5Agg")
+mp.rc('text', usetex=True)
+mp.rcParams['text.latex.preamble'] = r"\usepackage{amsmath}"
 
-    import matplotlib.pyplot as plt
-    import matplotlib.patches as mpatches
-
-except:
-    pass
-
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 import deep_lagrangian_networks.jax_DeLaN_model as delan
 from deep_lagrangian_networks.replay_memory import ReplayMemory
@@ -34,7 +29,7 @@ if __name__ == "__main__":
 
     # Read Command Line Arguments:
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", nargs=1, type=int, required=False, default=[True, ], help="Training using CUDA.")
+    parser.add_argument("-c", nargs=1, type=int, required=False, default=[False, ], help="Training using CUDA.")
     parser.add_argument("-i", nargs=1, type=int, required=False, default=[0, ], help="Set the CUDA id.")
     parser.add_argument("-s", nargs=1, type=int, required=False, default=[4, ], help="Set the random seed")
     parser.add_argument("-r", nargs=1, type=int, required=False, default=[1, ], help="Render the figure")
@@ -277,7 +272,8 @@ if __name__ == "__main__":
 
     fig = plt.figure(figsize=(24.0/1.54, 8.0/1.54), dpi=100)
     fig.subplots_adjust(left=0.08, bottom=0.12, right=0.98, top=0.95, wspace=0.3, hspace=0.2)
-    fig.canvas.set_window_title('Seed = {0}'.format(seed))
+    if hasattr(fig.canvas.manager, 'window'):
+        fig.canvas.manager.window.setWindowTitle('Seed = {0}'.format(seed))
 
     legend = [mp.patches.Patch(color=color_i[0], label="DeLaN"),
               mp.patches.Patch(color="k", label="Ground Truth")]

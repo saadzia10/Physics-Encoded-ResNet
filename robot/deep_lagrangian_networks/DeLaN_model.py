@@ -75,6 +75,25 @@ class CosDer(nn.Module):
     def forward(self, x):
         return -torch.sin(x)
 
+# Class for Tanh activation function
+class Tanh(nn.Module):
+    def __init__(self):
+        super(Tanh, self).__init__()
+
+    def forward(self, x):
+        return torch.tanh(x)
+
+# Class for the derivative of the Tanh activation function
+class TanhDer(nn.Module):
+    def __init__(self):
+        super(TanhDer, self).__init__()
+
+    def forward(self, x):
+        # Compute the tanh activation first
+        tanh_x = torch.tanh(x)
+        # Derivative of tanh is 1 - tanh^2(x)
+        return 1 - tanh_x ** 2
+
 
 class LagrangianLayer(nn.Module):
 
@@ -104,8 +123,12 @@ class LagrangianLayer(nn.Module):
             self.g = Linear()
             self.g_prime = LinearDer()
 
+        elif activation == "Tanh":
+            self.g = Tanh()
+            self.g_prime = TanhDer()
+
         else:
-            raise ValueError("Activation Type must be in ['Linear', 'ReLu', 'SoftPlus', 'Cos'] but is {0}".format(self.activation))
+            raise ValueError("Activation Type must be in ['Linear', 'ReLu', 'SoftPlus', 'Cos'] but is {0}".format(activation))
 
     def forward(self, q, der_prev):
         # Apply Affine Transformation:
@@ -338,10 +361,10 @@ class DeepLagrangianNetwork(nn.Module):
     def cuda(self, device=None):
 
         # Move the Network to the GPU:
-        super(DeepLagrangianNetwork, self).cuda(device=device)
+        super(DeepLagrangianNetwork, self).to(device)
 
         # Move the eye matrix to the GPU:
-        self._eye = self._eye.cuda()
+        self._eye = self._eye.to(device)
         self.device = self._eye.device
         return self
 

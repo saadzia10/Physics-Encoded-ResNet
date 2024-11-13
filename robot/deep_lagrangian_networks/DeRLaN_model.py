@@ -262,10 +262,10 @@ class DeepResidualLagrangianNetwork(nn.Module):
     def cuda(self, device=None):
 
         # Move the Network to the GPU:
-        super(DeepResidualLagrangianNetwork, self).cuda(device=device)
+        super(DeepResidualLagrangianNetwork, self).to(device)
 
         # Move the eye matrix to the GPU:
-        self._eye = self._eye.cuda()
+        self._eye = self._eye.to(device)
         self.device = self._eye.device
         return self
 

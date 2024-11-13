@@ -6,11 +6,12 @@ import time
 import matplotlib as mp
 
 from deep_lagrangian_networks.DeRLaN_model import DeepResidualLagrangianNetwork
+from deep_lagrangian_networks.DeLaN_model import DeepLagrangianNetwork
 
 try:
     mp.use("Qt5Agg")
     mp.rc('text', usetex=True)
-    mp.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
+    mp.rcParams['text.latex.preamble'] = r"\usepackage{amsmath}"
 
 except ImportError:
     pass
@@ -23,11 +24,13 @@ from deep_lagrangian_networks.replay_memory import PyTorchReplayMemory
 from deep_lagrangian_networks.utils import load_dataset, init_env
 
 
+dev = torch.device("mps")
+
 if __name__ == "__main__":
 
     # Read Command Line Arguments:
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", nargs=1, type=int, required=False, default=[True, ], help="Training using CUDA.")
+    parser.add_argument("-c", nargs=1, type=int, required=False, default=[False, ], help="Training using CUDA.")
     parser.add_argument("-i", nargs=1, type=int, required=False, default=[0, ], help="Set the CUDA id.")
     parser.add_argument("-s", nargs=1, type=int, required=False, default=[42, ], help="Set the random seed")
     parser.add_argument("-r", nargs=1, type=int, required=False, default=[1, ], help="Render the figure")
@@ -53,19 +56,19 @@ if __name__ == "__main__":
     print("Training Deep Lagrangian Networks (DeLaN):")
 
     # Construct Hyperparameters:
-    hyper = {'n_width': 16,
-             'n_depth': 4,
+    hyper = {'n_width': 64,
+             'n_depth': 2,
              'diagonal_epsilon': 0.01,
-             'activation': 'SoftPlus',
+             'activation': 'Tanh',
              'b_init': 1.e-4,
              'b_diag_init': 0.001,
              'w_init': 'xavier_normal',
              'gain_hidden': np.sqrt(2.),
              'gain_output': 0.1,
              'n_minibatch': 512,
-             'learning_rate': 5.e-04,
+             'learning_rate': 1.e-04,
              'weight_decay': 1.e-5,
-             'max_epoch': 5000}
+             'max_epoch': 10000}
 
     # Load existing model parameters:
     if load_model:
@@ -74,12 +77,12 @@ if __name__ == "__main__":
 
         delan_model = DeepLagrangianNetwork(n_dof, **state['hyper'])
         delan_model.load_state_dict(state['state_dict'])
-        delan_model = delan_model.cuda() if cuda else delan_model.cpu()
+        delan_model = delan_model.to(dev) if cuda else delan_model.cpu()
 
     else:
         # Construct DeLaN:
-        delan_model = DeepResidualLagrangianNetwork(n_dof, **hyper)
-        delan_model = delan_model.cuda() if cuda else delan_model.cpu()
+        delan_model = DeepLagrangianNetwork(n_dof, **hyper)  # DeepResidualLagrangianNetwork(n_dof, **hyper)
+        delan_model = delan_model.to(dev) if cuda else delan_model.cpu()
 
     # Generate & Initialize the Optimizer:
     optimizer = torch.optim.Adam(delan_model.parameters(),
@@ -89,7 +92,7 @@ if __name__ == "__main__":
 
     # Generate Replay Memory:
     mem_dim = ((n_dof, ), (n_dof, ), (n_dof, ), (n_dof, ))
-    mem = PyTorchReplayMemory(train_qp.shape[0], hyper["n_minibatch"], mem_dim, cuda)
+    mem = PyTorchReplayMemory(train_qp.shape[0], hyper["n_minibatch"], mem_dim, cuda, dev)
     mem.add_samples([train_qp, train_qv, train_qa, train_tau])
 
     # Start Training Loop:
@@ -246,7 +249,9 @@ if __name__ == "__main__":
 
     fig = plt.figure(figsize=(24.0/1.54, 8.0/1.54), dpi=400)
     fig.subplots_adjust(left=0.08, bottom=0.12, right=0.98, top=0.95, wspace=0.3, hspace=0.2)
-    fig.canvas.set_window_title('Seed = {0}'.format(seed))
+    # Check if the manager has a window attribute and set the title
+    if hasattr(fig.canvas.manager, 'window'):
+        fig.canvas.manager.window.setWindowTitle('Seed = {0}'.format(seed))
 
     legend = [mp.patches.Patch(color=color_i[0], label="PERNN"),
               mp.patches.Patch(color="k", label="Ground Truth")]
