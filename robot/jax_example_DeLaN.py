@@ -63,7 +63,7 @@ if __name__ == "__main__":
         'activation': 'tanh',
         'learning_rate': 1.e-04,
         'weight_decay': 1.e-5,
-        'max_epoch': int(2.5 * 1e3) if dataset == "uniform" else int(5 * 1e3),
+        'max_epoch': int(2.5 * 1e3) if dataset == "uniform" else int(10 * 1e3),
         'lagrangian_type': lagrangian_type,
         }
 

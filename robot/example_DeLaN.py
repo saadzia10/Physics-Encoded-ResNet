@@ -40,9 +40,9 @@ if __name__ == "__main__":
 
     # Read the dataset:
     n_dof = 2
-    train_data, test_data, divider = load_dataset()
-    train_labels, train_qp, train_qv, train_qa, train_tau = train_data
-    test_labels, test_qp, test_qv, test_qa, test_tau, test_m, test_c, test_g = test_data
+    train_data, test_data, divider, dt = load_dataset()
+    train_labels, train_qp, train_qv, train_qa, train_p, train_pd, train_tau = train_data
+    test_labels, test_qp, test_qv, test_qa, test_p, test_pd, test_tau, test_m, test_c, test_g = test_data
 
     print("\n\n################################################")
     print("Characters:")
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # Construct Hyperparameters:
     hyper = {'n_width': 64,
              'n_depth': 2,
-             'diagonal_epsilon': 0.01,
+             'diagonal_epsilon': 0.1,
              'activation': 'Tanh',
              'b_init': 1.e-4,
              'b_diag_init': 0.001,
