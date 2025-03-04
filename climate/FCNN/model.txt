@@ -1,0 +1,58 @@
+FCNN(
+  (encoder): Sequential(
+    (0): ResidualBlock(
+      (fc): Linear(in_features=16, out_features=16, bias=True)
+      (activation): LeakyReLU(negative_slope=0.01)
+      (norm): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (1): ResidualBlock(
+      (fc): Linear(in_features=16, out_features=16, bias=True)
+      (activation): LeakyReLU(negative_slope=0.01)
+      (norm): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (2): Linear(in_features=16, out_features=32, bias=True)
+  )
+  (nee_decoder): Sequential(
+    (0): ResidualBlock(
+      (fc): Linear(in_features=32, out_features=16, bias=True)
+      (activation): LeakyReLU(negative_slope=0.01)
+      (norm): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (projection): Linear(in_features=32, out_features=16, bias=True)
+    )
+    (1): ResidualBlock(
+      (fc): Linear(in_features=16, out_features=16, bias=True)
+      (activation): LeakyReLU(negative_slope=0.01)
+      (norm): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (2): Linear(in_features=16, out_features=1, bias=True)
+  )
+  (temp_derivative_decoder): Sequential(
+    (0): ResidualBlock(
+      (fc): Linear(in_features=32, out_features=16, bias=True)
+      (activation): LeakyReLU(negative_slope=0.01)
+      (norm): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (projection): Linear(in_features=32, out_features=16, bias=True)
+    )
+    (1): ResidualBlock(
+      (fc): Linear(in_features=16, out_features=16, bias=True)
+      (activation): LeakyReLU(negative_slope=0.01)
+      (norm): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (2): Linear(in_features=16, out_features=1, bias=True)
+  )
+  (k_decoder): Sequential(
+    (0): ResidualBlock(
+      (fc): Linear(in_features=32, out_features=16, bias=True)
+      (activation): LeakyReLU(negative_slope=0.01)
+      (norm): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (projection): Linear(in_features=32, out_features=16, bias=True)
+    )
+    (1): ResidualBlock(
+      (fc): Linear(in_features=16, out_features=16, bias=True)
+      (activation): LeakyReLU(negative_slope=0.01)
+      (norm): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (2): Linear(in_features=16, out_features=2, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+  )
+)

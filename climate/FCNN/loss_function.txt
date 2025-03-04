@@ -1,0 +1,18 @@
+def loss_function(nee_pred, nee_true, temp_pred, temp_true, E0_rb_pred,
+                      E0_rb_true, loss_fn):
+        # Loss for NEE (u)
+        loss_nee = loss_fn(nee_pred, nee_true)
+
+        # Loss for E0 and rb (k)
+        E0_pred, rb_pred = E0_rb_pred[:, 0], E0_rb_pred[:, 1]
+        E0_true, rb_true = E0_rb_true[:, 0], E0_rb_true[:, 1]
+
+        loss_E0 = loss_fn(E0_pred.view((-1, 1)), E0_true.view((-1, 1)))
+        loss_rb = loss_fn(rb_pred.view((-1, 1)), rb_true.view((-1, 1)))
+
+        # loss for temperature derivative (f)
+        temp_loss = loss_fn(temp_pred.view((-1, 1)), temp_true.view((-1, 1)))
+
+        # Total loss
+        # total_loss = loss_nee + loss_E0 + loss_rb + temp_loss + physics_loss + f_loss
+        return loss_nee, loss_E0, loss_rb, temp_loss
